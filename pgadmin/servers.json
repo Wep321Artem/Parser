@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Parser",
+      "Group": "Servers",
+      "Host": "parserdatabase",
+      "Port": 5432,
+      "MaintenanceDB": "Parser",
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "PassFile": "/var/lib/pgadmin/.pgpass"
+    }
+  }
+}

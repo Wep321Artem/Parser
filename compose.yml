@@ -1,0 +1,45 @@
+services:
+  parserdatabase:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: Parser
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+      PGPASS_FILE: /pgpass
+    ports:
+      - "8080:80"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin/pgpass:/pgpass:ro
+    depends_on:
+      - parserdatabase
+
+  api:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_dir: /src
+    volumes:
+      - ./:/src
+    ports:
+      - "8090:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__postgre: Host=parserdatabase;Port=5432;Database=Parser;Username=postgres;Password=postgres
+    command: dotnet run --project Parser/Parser.csproj --urls http://+:8080
+    depends_on:
+      - parserdatabase
+
+volumes:
+  pgdata:
